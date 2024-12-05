@@ -1,19 +1,29 @@
 <?php
 session_start();
 require 'db_connect.php';
-if (!isset($_SESSION['username'])) {
+if (!isset($_SESSION['username']) || !isset($_SESSION['user_id'])) {
     header("Location: login.php");
-    exit(); }
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    exit();
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
-    $workout_type = $_POST['workout_type'];
-    $duration = $_POST['duration'];
-    $date = $_POST['date'];
-    $stmt = $conn->prepare("INSERT INTO workouts (user_id, workout_type, duration, date) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("isis", $user_id, $workout_type, $duration, $date);
-    $stmt->execute();
-    header("Location: dashboard.php");
-    exit(); }
+    $workout_type = htmlspecialchars(trim($_POST['workout_type']));
+    $duration = intval($_POST['duration']);
+    $date = htmlspecialchars(trim($_POST['date']));
+
+    try {
+        $stmt = $conn->prepare("INSERT INTO workouts (user_id, workout_type, duration, date) VALUES (:user_id, :workout_type, :duration, :date)");
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':workout_type', $workout_type, PDO::PARAM_STR);
+        $stmt->bindParam(':duration', $duration, PDO::PARAM_INT);
+        $stmt->bindParam(':date', $date, PDO::PARAM_STR);
+        $stmt->execute();
+        header("Location: dashboard.php");
+        exit();
+    } catch (PDOException $e) {
+        die("Error: " . $e->getMessage());
+    }
+}
 ?>
 <!DOCTYPE html>
 <html>

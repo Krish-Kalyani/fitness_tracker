@@ -14,6 +14,7 @@ exit(); }
         <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
          <a href="add_workout.php">Add Workout</a> | 
          <a href="view_workouts.php">View Workouts</a> | 
+         <a href="manage_workouts.php">Manage Workouts</a> |
          <a href="logout.php">Logout</a>
 </body>
 </html>

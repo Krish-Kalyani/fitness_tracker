@@ -1,9 +1,12 @@
 <?php
-$servername = "localhost";
+$dsn = "mysql:host=localhost;dbname=fitness_tracker;charset=utf8mb4";
 $username = "root";
-$password = "";     
-$dbname = "fitness_tracker";
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error); }
+$password = "";
+
+try {
+    $conn = new PDO($dsn, $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
 ?>

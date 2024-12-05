@@ -1,22 +1,30 @@
 <?php
 session_start();
 require 'db_connect.php';
+
 if (!isset($_SESSION['user_id'])) {
-    die("Access denied. Please log in."); }
-$user_id = $_SESSION['user_id'];
+    die("Access denied. Please log in.");
+}
+
 if (!isset($_GET['id'])) {
-    die("Invalid request. No workout ID provided."); }
+    die("Workout ID is missing.");
+}
+
 $workout_id = intval($_GET['id']);
+$user_id = $_SESSION['user_id'];
+
 try {
-    $stmt = $conn->prepare("DELETE FROM workouts WHERE id = :workout_id AND user_id = :user_id");
-    $stmt->bindParam(':workout_id', $workout_id, PDO::PARAM_INT);
+    $stmt = $conn->prepare("DELETE FROM workouts WHERE id = :id AND user_id = :user_id");
+    $stmt->bindParam(':id', $workout_id, PDO::PARAM_INT);
     $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+
     if ($stmt->execute()) {
-        echo "Workout deleted successfully.";
+        header("Location: manage_workouts.php");
+        exit;
     } else {
-        echo "Failed to delete workout. Please try again.";
+        echo "Failed to delete workout.";
     }
 } catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
+    die("Error deleting workout: " . $e->getMessage());
 }
 ?>
